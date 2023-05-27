@@ -5,8 +5,8 @@ build-backend = "maturin"
 [project]
 name = "hl7conv2"
 requires-python = ">=3.7"
-version = "0.1.1"
-repository = "https://github.com/IlyaKalosha/hl7conv"
+version = "0.1.2"
+repository = "https://github.com/IlyaKalosha/hl7conv2"
 keywords = ["hl7", "convert", "JSON"]
 readme = "README.md"
 description = "Converts hl7 and json formats in both ways"
@@ -17,9 +17,9 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/IlyaKalosha/hl7conv"
-"Change Log" = "https://github.com/IlyaKalosha/hl7conv/releases"
-"Issues" = "https://github.com/IlyaKalosha/hl7conv/issues"
+"Homepage" = "https://github.com/IlyaKalosha/hl7conv2"
+"Change Log" = "https://github.com/IlyaKalosha/hl7conv2/releases"
+"Issues" = "https://github.com/IlyaKalosha/hl7conv2/issues"
 
 
 [tool.maturin]
