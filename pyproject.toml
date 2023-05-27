@@ -5,6 +5,14 @@ build-backend = "maturin"
 [project]
 name = "hl7conv2"
 requires-python = ">=3.7"
+keywords = ["hl7", "convert", "JSON"]
+readme = "README.md"
+description = "Converts hl7 and json formats in both ways"
+authors = [{author = "Ilya Kalosha", email = "kalosha.ilya@yandex.ru>"}]
+
+[tool.poetry]
+name = "hl7conv"
+version = "0.1.1"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
