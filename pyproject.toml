@@ -10,7 +10,6 @@ repository = "https://github.com/IlyaKalosha/hl7conv"
 keywords = ["hl7", "convert", "JSON"]
 readme = "README.md"
 description = "Converts hl7 and json formats in both ways"
-authors = [{author = "Ilya Kalosha", email = "kalosha.ilya@yandex.ru>"}]
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
