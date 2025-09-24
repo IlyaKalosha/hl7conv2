@@ -1,0 +1,7 @@
+[package]
+name = "hl7conv2-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hl7conv2 = { path = ".." }
