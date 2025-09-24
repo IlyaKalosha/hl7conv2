@@ -65,7 +65,7 @@ jobs:
 
     - name: Test Python wheel
       run: |
-        pip install dist/*.whl
+        pip install $(ls dist/*.whl) --force-reinstall
         python -c "import hl7conv2; print('Import successful')"
         python -c "from hl7conv2 import Hl7Json, JsonHl7; print('Classes imported successfully')"
 
