@@ -50,7 +50,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install maturin
-      run: pip install maturin[patchelf]
+      run: |
+        if [[ "$RUNNER_OS" == "Linux" ]]; then
+          pip install maturin[patchelf]
+        else
+          pip install maturin
+        fi
 
     - name: Run custom lint script
       run: ./lint.sh

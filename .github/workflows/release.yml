@@ -47,7 +47,12 @@ jobs:
         python-version: '3.x'
 
     - name: Install maturin
-      run: pip install maturin[patchelf]
+      run: |
+        if [[ "$RUNNER_OS" == "Linux" ]]; then
+          pip install maturin[patchelf]
+        else
+          pip install maturin
+        fi
 
     - name: Run lint checks
       run: ./lint.sh
