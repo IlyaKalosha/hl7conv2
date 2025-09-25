@@ -53,15 +53,15 @@ impl Hl7Validator {
 
     fn validate_msh_segment(&self, msh: &Hl7Segment) -> Result<(), Hl7Error> {
         if msh.segment_name != "MSH" {
-            return Err(Hl7Error::ValidationError(
-                "First segment must be MSH (Message Header)".to_string(),
-            ));
+            return Err(Hl7Error::MissingRequiredSegment {
+                segment: "MSH (Message Header)".to_string(),
+            });
         }
 
         if msh.fields.len() < 12 {
-            return Err(Hl7Error::ValidationError(
-                "MSH segment must have at least 12 fields".to_string(),
-            ));
+            return Err(Hl7Error::ValidationFailed {
+                details: "MSH segment must have at least 12 fields".to_string(),
+            });
         }
 
         self.validate_field_separators(msh)?;
@@ -74,14 +74,14 @@ impl Hl7Validator {
     fn validate_field_separators(&self, msh: &Hl7Segment) -> Result<(), Hl7Error> {
         if let Some(field_1) = msh.fields.get(&1) {
             if field_1.value.len() != 4 {
-                return Err(Hl7Error::ValidationError(
-                    "Field separators (field 1) must be exactly 4 characters".to_string(),
-                ));
+                return Err(Hl7Error::InvalidFieldSeparators {
+                    separators: field_1.value.clone(),
+                });
             }
         } else {
-            return Err(Hl7Error::ValidationError(
-                "Field separators (field 1) are required".to_string(),
-            ));
+            return Err(Hl7Error::ValidationFailed {
+                details: "Field separators (field 1) are required".to_string(),
+            });
         }
 
         Ok(())
@@ -95,12 +95,15 @@ impl Hl7Validator {
             ];
 
             if self.strict_mode && !supported_versions.contains(&version.as_str()) {
-                return Err(Hl7Error::UnsupportedVersion(version.clone()));
+                return Err(Hl7Error::UnsupportedVersion {
+                    version: version.clone(),
+                    supported_versions: supported_versions.join(", "),
+                });
             }
         } else {
-            return Err(Hl7Error::ValidationError(
-                "HL7 version (field 12) is required".to_string(),
-            ));
+            return Err(Hl7Error::ValidationFailed {
+                details: "HL7 version (field 12) is required".to_string(),
+            });
         }
 
         Ok(())
@@ -113,15 +116,15 @@ impl Hl7Validator {
             if self.strict_mode {
                 let parts: Vec<&str> = message_type.split('^').collect();
                 if parts.len() < 3 {
-                    return Err(Hl7Error::ValidationError(
-                        "Message type (field 8) must have at least 3 components: event^structure^version".to_string(),
-                    ));
+                    return Err(Hl7Error::ValidationFailed {
+                        details: "Message type (field 8) must have at least 3 components: event^structure^version".to_string(),
+                    });
                 }
             }
         } else {
-            return Err(Hl7Error::ValidationError(
-                "Message type (field 8) is required".to_string(),
-            ));
+            return Err(Hl7Error::ValidationFailed {
+                details: "Message type (field 8) is required".to_string(),
+            });
         }
 
         Ok(())
@@ -140,9 +143,9 @@ impl Hl7Validator {
         }
 
         if !has_pid {
-            return Err(Hl7Error::ValidationError(
-                "PID (Patient Identification) segment is required".to_string(),
-            ));
+            return Err(Hl7Error::MissingRequiredSegment {
+                segment: "PID (Patient Identification)".to_string(),
+            });
         }
 
         Ok(())
@@ -150,17 +153,15 @@ impl Hl7Validator {
 
     fn validate_segment(&self, segment: &Hl7Segment, index: usize) -> Result<(), Hl7Error> {
         if segment.segment_name.is_empty() {
-            return Err(Hl7Error::ValidationError(format!(
-                "Segment {} has empty segment name",
-                index + 1
-            )));
+            return Err(Hl7Error::ValidationFailed {
+                details: format!("Segment {} has empty segment name", index + 1),
+            });
         }
 
         if segment.segment_name.len() != 3 {
-            return Err(Hl7Error::ValidationError(format!(
-                "Segment name '{}' must be exactly 3 characters",
-                segment.segment_name
-            )));
+            return Err(Hl7Error::InvalidSegmentName {
+                name: segment.segment_name.clone(),
+            });
         }
 
         if !segment
@@ -168,10 +169,9 @@ impl Hl7Validator {
             .chars()
             .all(|c| c.is_ascii_alphabetic())
         {
-            return Err(Hl7Error::ValidationError(format!(
-                "Segment name '{}' must contain only alphabetic characters",
-                segment.segment_name
-            )));
+            return Err(Hl7Error::InvalidSegmentName {
+                name: segment.segment_name.clone(),
+            });
         }
 
         for (field_index, field) in &segment.fields {
@@ -183,27 +183,25 @@ impl Hl7Validator {
 
     fn validate_field(
         &self,
-        segment: &Hl7Segment,
-        field_index: usize,
+        _segment: &Hl7Segment,
+        _field_index: usize,
         field: &Hl7Field,
     ) -> Result<(), Hl7Error> {
-        if field.value.len() > 65536 {
-            return Err(Hl7Error::FieldError {
-                segment: segment.segment_name.clone(),
-                field: field_index,
-                message: "Field value exceeds maximum length of 65536 characters".to_string(),
+        const MAX_FIELD_LENGTH: usize = 65536;
+
+        if field.value.len() > MAX_FIELD_LENGTH {
+            return Err(Hl7Error::FieldTooLong {
+                length: field.value.len(),
+                max_length: MAX_FIELD_LENGTH,
             });
         }
 
         if let Some(components) = &field.components {
-            for (comp_index, component) in components.iter().enumerate() {
-                if component.len() > 65536 {
-                    return Err(Hl7Error::ComponentError {
-                        segment: segment.segment_name.clone(),
-                        field: field_index,
-                        component: comp_index + 1,
-                        message: "Component value exceeds maximum length of 65536 characters"
-                            .to_string(),
+            for component in components.iter() {
+                if component.len() > MAX_FIELD_LENGTH {
+                    return Err(Hl7Error::ComponentTooLong {
+                        length: component.len(),
+                        max_length: MAX_FIELD_LENGTH,
                     });
                 }
             }

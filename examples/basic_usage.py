@@ -78,26 +78,22 @@ PID|1||PATID1234^5^M11^ADT1^MR^GOOD HEALTH HOSPITAL||EVERYMAN^ADAM^A^III||196106
     # Example 4: Validation features
     print("4. Validation Features:")
     
-    # Create instance with validation enabled (default)
+    # Create instance with validation enabled
     valid_hl7 = Hl7Json("MSH|^~\\&|ADT1|HOSPITAL|LAB|HOSPITAL|20240101120000|SECURITY|ADT^A01^ADT_A01|MSG00001|T|2.5.1\nPID|1||PATID1234||DOE^JOHN||19800101|M")
     print(f"Validation enabled: {valid_hl7.validation_enabled}")
     print(f"Strict validation: {valid_hl7.strict_validation}")
     
-    # Get validation info
-    validation_info = valid_hl7.get_validation_info()
-    print(f"Validation status: {validation_info['validation_status']}")
-    print(f"Validation message: {validation_info['validation_message']}")
-    
     # Test with invalid message
     try:
         invalid_hl7 = Hl7Json("INVALID|SEGMENT")
+        invalid_hl7.validation_enabled = True
         invalid_hl7.validate()
         print("❌ Should have failed validation")
     except Exception as e:
         print(f"✅ Correctly caught validation error: {e}")
     
     # Disable validation for invalid message
-    invalid_hl7.disable_validation()
+    invalid_hl7.validation_enabled = False
     json_data = invalid_hl7.hl7_json
     print(f"✅ Successfully processed invalid message with validation disabled: {len(json_data)} segments")
     

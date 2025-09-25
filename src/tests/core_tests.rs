@@ -74,17 +74,14 @@ fn test_escape_handler_from_msh() {
 fn test_escape_handler_sequences() {
     let handler = Hl7EscapeHandler::default();
 
-    // Test line feed
     let text = "Line1\\X0A\\Line2";
     let unescaped = handler.unescape(text);
     assert_eq!(unescaped, "Line1\nLine2");
 
-    // Test carriage return
     let text = "Line1\\X0D\\Line2";
     let unescaped = handler.unescape(text);
     assert_eq!(unescaped, "Line1\rLine2");
 
-    // Test space
     let text = "Word1\\X20\\Word2";
     let unescaped = handler.unescape(text);
     assert_eq!(unescaped, "Word1 Word2");

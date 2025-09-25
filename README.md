@@ -231,7 +231,7 @@ except ValueError as e:
     print(f"Validation error: {e}")
 
 # Custom validation settings
-hl7_obj.validate_with_custom_validator(
+hl7_obj.validate(
     strict_mode=True,
     validate_required_fields=True
 )

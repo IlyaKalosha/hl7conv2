@@ -50,19 +50,13 @@ impl Hl7EscapeHandler {
 
     pub fn from_msh_field(field_1: &str) -> Result<Self, Hl7Error> {
         if field_1.len() != 4 {
-            return Err(Hl7Error::ValidationError(
-                "Field separators must be exactly 4 characters".to_string(),
-            ));
+            return Err(Hl7Error::InvalidFieldSeparators {
+                separators: field_1.to_string(),
+            });
         }
 
         let chars: Vec<char> = field_1.chars().collect();
-        Ok(Self::new(
-            chars[0], // field separator
-            chars[1], // component separator
-            chars[2], // repetition separator
-            chars[3], // escape character
-            '&',      // subcomponent separator (not in field 1)
-        ))
+        Ok(Self::new(chars[0], chars[1], chars[2], chars[3], '&'))
     }
 
     pub fn unescape(&self, text: &str) -> String {
@@ -94,7 +88,6 @@ impl Hl7EscapeHandler {
                             result.push_str(&sequence);
                         }
 
-                        // Consume the closing escape character if it exists
                         if let Some(&ch) = chars.peek() {
                             if ch == escape_char {
                                 chars.next();
