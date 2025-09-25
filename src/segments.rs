@@ -1,19 +1,21 @@
+use crate::escape::Hl7EscapeHandler;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Hl7Segment {
     pub segment_name: String,
     pub fields: BTreeMap<usize, Hl7Field>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Hl7Field {
     pub value: String,
     pub components: Option<Vec<String>>,
 }
 
 impl Hl7Segment {
-    pub fn from_string(segment_str: &str) -> Self {
+    pub fn from_string(segment_str: &str, escape_handler: Option<&Hl7EscapeHandler>) -> Self {
         let parts: Vec<&str> = segment_str.split('|').collect();
         let segment_name = parts.first().unwrap_or(&"").to_string();
 
@@ -23,7 +25,7 @@ impl Hl7Segment {
                 continue;
             }
 
-            let field = Hl7Field::from_string(part);
+            let field = Hl7Field::from_string(part, escape_handler);
             fields.insert(index, field);
         }
 
@@ -53,12 +55,23 @@ impl Hl7Segment {
 }
 
 impl Hl7Field {
-    pub fn from_string(field_str: &str) -> Self {
-        let value = field_str.to_string();
-        let components = if field_str.contains('^') && !field_str.contains("^~\\&") {
-            Some(field_str.split('^').map(|s| s.to_string()).collect())
+    pub fn from_string(field_str: &str, escape_handler: Option<&Hl7EscapeHandler>) -> Self {
+        let (value, components) = if let Some(handler) = escape_handler {
+            let unescaped_value = handler.unescape(field_str);
+            let components = if unescaped_value.contains(handler.get_component_separator()) {
+                Some(handler.parse_field_with_escaping(field_str))
+            } else {
+                None
+            };
+            (unescaped_value, components)
         } else {
-            None
+            let value = field_str.to_string();
+            let components = if field_str.contains('^') && !field_str.contains("^~\\&") {
+                Some(field_str.split('^').map(|s| s.to_string()).collect())
+            } else {
+                None
+            };
+            (value, components)
         };
 
         Hl7Field { value, components }

@@ -2,7 +2,7 @@ use crate::segments::{Hl7Field, Hl7Segment};
 
 #[test]
 fn test_segment_from_string() {
-    let segment = Hl7Segment::from_string("MSH|^~\\&|ADT1|HOSPITAL|LAB");
+    let segment = Hl7Segment::from_string("MSH|^~\\&|ADT1|HOSPITAL|LAB", None);
 
     assert_eq!(segment.segment_name, "MSH");
     assert_eq!(segment.fields.len(), 4);
@@ -12,7 +12,7 @@ fn test_segment_from_string() {
 
 #[test]
 fn test_field_with_components() {
-    let field = Hl7Field::from_string("ADT^A01^ADT_A01");
+    let field = Hl7Field::from_string("ADT^A01^ADT_A01", None);
 
     assert_eq!(field.value, "ADT^A01^ADT_A01");
     assert_eq!(
@@ -39,7 +39,7 @@ fn test_field_with_components() {
 
 #[test]
 fn test_field_without_components() {
-    let field = Hl7Field::from_string("ADT1");
+    let field = Hl7Field::from_string("ADT1", None);
 
     assert_eq!(field.value, "ADT1");
     assert_eq!(field.components, None);
@@ -47,7 +47,7 @@ fn test_field_without_components() {
 
 #[test]
 fn test_segment_to_json() {
-    let segment = Hl7Segment::from_string("MSH|^~\\&|ADT1|HOSPITAL");
+    let segment = Hl7Segment::from_string("MSH|^~\\&|ADT1|HOSPITAL", None);
     let json = segment.to_json();
 
     assert_eq!(json.get("segment_name"), Some(&"MSH".to_string()));

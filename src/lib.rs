@@ -1,8 +1,10 @@
 mod errors;
+mod escape;
 mod hl7_json;
 mod json_hl7;
 mod segments;
 mod utils;
+mod validation;
 
 #[cfg(test)]
 mod tests;

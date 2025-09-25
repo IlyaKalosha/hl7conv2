@@ -1,32 +1,52 @@
 use pyo3::exceptions::PyException;
 use pyo3::prelude::*;
-use std::fmt;
+use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum Hl7Error {
-    IoError(std::io::Error),
+    #[error("I/O error: {0}")]
+    IoError(#[from] std::io::Error),
+
+    #[error("HL7 invalid format: {0}")]
     InvalidFormat(String),
+
+    #[error("HL7 message is empty")]
     EmptyMessage,
+
+    #[error("HL7 invalid segment: {0}")]
     InvalidSegment(String),
-}
 
-impl fmt::Display for Hl7Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Hl7Error::IoError(e) => write!(f, "IO error: {}", e),
-            Hl7Error::InvalidFormat(msg) => write!(f, "Invalid HL7 format: {}", msg),
-            Hl7Error::EmptyMessage => write!(f, "Empty HL7 message"),
-            Hl7Error::InvalidSegment(msg) => write!(f, "Invalid segment: {}", msg),
-        }
-    }
-}
+    #[error("HL7 parsing error at line {line}: {message}")]
+    ParsingError { line: usize, message: String },
 
-impl std::error::Error for Hl7Error {}
+    #[error("HL7 validation error: {0}")]
+    ValidationError(String),
 
-impl From<std::io::Error> for Hl7Error {
-    fn from(error: std::io::Error) -> Self {
-        Hl7Error::IoError(error)
-    }
+    #[error("HL7 field error in segment {segment}, field {field}: {message}")]
+    FieldError {
+        segment: String,
+        field: usize,
+        message: String,
+    },
+
+    #[error(
+        "HL7 component error in segment {segment}, field {field}, component {component}: {message}"
+    )]
+    ComponentError {
+        segment: String,
+        field: usize,
+        component: usize,
+        message: String,
+    },
+
+    #[error("JSON parsing error: {0}")]
+    JsonError(#[from] serde_json::Error),
+
+    #[error("HL7 version not supported: {0}")]
+    UnsupportedVersion(String),
+
+    #[error("HL7 encoding error: {0}")]
+    EncodingError(String),
 }
 
 impl From<Hl7Error> for PyErr {
