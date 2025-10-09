@@ -3,7 +3,7 @@
 A high-performance HL7 to JSON converter written in Rust with Python bindings, featuring comprehensive validation and escape sequence support.
 
 ## About
-This is a Python library written in Rust that provides bidirectional conversion between HL7 (Health Level 7) medical format and JSON, with built-in validation capabilities and support for HL7 escape sequences.
+This is a Python library written in Rust that provides bidirectional conversion between HL7 (Health Level 7) medical format and JSON, with built-in validation capabilities and support for HL7 escape sequences. The JSON payload after conversion is compatible with Google's HL7 storage parser.
 
 ### Features
 

@@ -25,6 +25,7 @@ pub struct Hl7Json {
 #[pymethods]
 impl Hl7Json {
     #[new]
+    #[pyo3(signature = (hl7_string, validation_enabled=None, strict_validation=None, escaping_enabled=None))]
     pub fn new(
         hl7_string: String,
         validation_enabled: Option<bool>,
@@ -41,6 +42,7 @@ impl Hl7Json {
     }
 
     #[classmethod]
+    #[pyo3(signature = (path, validation_enabled=None, strict_validation=None, escaping_enabled=None))]
     fn from_file(
         _cls: &Bound<PyType>,
         path: String,
