@@ -34,8 +34,8 @@ impl Hl7Json {
         Hl7Json {
             hl7_string: utils::replace_eof(hl7_string),
             validation_enabled: validation_enabled.unwrap_or(false),
-            strict_validation: strict_validation.unwrap_or(true),
-            escaping_enabled: escaping_enabled.unwrap_or(false),
+            strict_validation: strict_validation.unwrap_or(false),
+            escaping_enabled: escaping_enabled.unwrap_or(true),
             escape_handler: create_default_escape_handler(),
         }
     }
@@ -57,8 +57,8 @@ impl Hl7Json {
         Ok(Hl7Json {
             hl7_string: utils::replace_eof(contents),
             validation_enabled: validation_enabled.unwrap_or(false),
-            strict_validation: strict_validation.unwrap_or(true),
-            escaping_enabled: escaping_enabled.unwrap_or(false),
+            strict_validation: strict_validation.unwrap_or(false),
+            escaping_enabled: escaping_enabled.unwrap_or(true),
             escape_handler: create_default_escape_handler(),
         })
     }
@@ -75,7 +75,7 @@ impl Hl7Json {
 
     pub fn _convert_hl7_to_json(&self) -> PyResult<Vec<BTreeMap<String, String>>> {
         if self.validation_enabled {
-            self.validate(Some(self.strict_validation), Some(true))?;
+            self.validate(Some(self.strict_validation), Some(false))?;
         }
 
         let mut message_json: Vec<BTreeMap<String, String>> = Vec::new();

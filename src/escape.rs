@@ -181,6 +181,10 @@ impl Hl7EscapeHandler {
     pub fn get_component_separator(&self) -> char {
         self.component_separator
     }
+
+    pub fn get_repetition_separator(&self) -> char {
+        self.repetition_separator
+    }
 }
 
 pub fn create_default_escape_handler() -> Hl7EscapeHandler {
