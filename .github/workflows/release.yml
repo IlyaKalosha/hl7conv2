@@ -54,6 +54,12 @@ jobs:
       if: runner.os != 'Linux'
       run: pip install maturin
 
+    - name: Install cargo-tomlfmt
+      run: cargo install cargo-tomlfmt
+
+    - name: Make lint script executable
+      run: chmod +x ./lint.sh
+
     - name: Run lint checks
       run: ./lint.sh
 
