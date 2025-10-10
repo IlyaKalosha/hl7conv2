@@ -1,22 +1,19 @@
-name: Validation
+name: Release
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  release:
+    types: [published]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lint-and-test:
-    name: Lint and Test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.8, 3.9, "3.10", "3.11", "3.12"]
+  release:
+    name: Release to PyPI
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
     - uses: actions/checkout@v4
@@ -44,10 +41,10 @@ jobs:
         path: target
         key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.x'
 
     - name: Install maturin (Linux)
       if: runner.os == 'Linux'
@@ -63,7 +60,7 @@ jobs:
     - name: Make lint script executable
       run: chmod +x ./lint.sh
 
-    - name: Run custom lint script
+    - name: Run lint checks
       run: ./lint.sh
 
     - name: Run tests
@@ -78,17 +75,7 @@ jobs:
         python -c "import hl7conv2; print('Import successful')"
         python -c "from hl7conv2 import Hl7Json, JsonHl7; print('Classes imported successfully')"
 
-  security-audit:
-    name: Security Audit
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
-
-    - name: Install cargo-audit
-      run: cargo install cargo-audit
-
-    - name: Run security audit
-      run: cargo audit
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}

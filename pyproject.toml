@@ -1,20 +1,38 @@
 [build-system]
-requires = ["maturin>=1.0,<2.0"]
+requires = ["maturin>=1.9.4,<2.0"]
 build-backend = "maturin"
 
 [project]
 name = "hl7conv2"
-requires-python = ">=3.7"
-version = "0.1.2"
+requires-python = ">=3.8"
+version = "0.2.0"
+authors = [
+    {name = "Ilya Kalosha", email = "kalosha.ilya@yandex.com"}
+]
 repository = "https://github.com/IlyaKalosha/hl7conv2"
-keywords = ["hl7", "convert", "JSON"]
+keywords = ["hl7", "healthcare", "json", "converter", "medical", "health-level-7"]
 readme = "README.md"
-description = "Converts hl7 and json formats in both ways"
+description = "A high-performance HL7 to JSON converter written in Rust with Python bindings"
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup",
 ]
+dependencies = []
 
 [project.urls]
 "Homepage" = "https://github.com/IlyaKalosha/hl7conv2"
@@ -24,3 +42,5 @@ classifiers = [
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
+module-name = "hl7conv2.hl7conv2"
+python-source = "python"
