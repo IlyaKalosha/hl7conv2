@@ -42,3 +42,4 @@ dependencies = []
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
+module-name = "hl7conv2.hl7conv2"
