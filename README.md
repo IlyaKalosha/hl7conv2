@@ -1,4 +1,5 @@
 # HL7Conv2
+[![PyPI](https://img.shields.io/pypi/v/hl7conv2.svg)](https://pypi.org/project/hl7conv2/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A high-performance HL7 to JSON converter written in Rust with Python bindings, featuring comprehensive validation and escape sequence support.
 
