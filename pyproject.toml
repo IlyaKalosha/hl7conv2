@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "hl7conv2"
 requires-python = ">=3.8"
-version = "0.2.0"
+version = "0.2.1"
 authors = [
     {name = "Ilya Kalosha", email = "kalosha.ilya@yandex.com"}
 ]
