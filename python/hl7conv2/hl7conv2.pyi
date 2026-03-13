@@ -76,7 +76,12 @@ class JsonHl7:
     
     @property
     def hl7_string(self) -> str:
-        """Converts the JSON data to HL7 message format."""
+        """Converts the JSON data to HL7 message format with escaping."""
+        ...
+
+    @property
+    def hl7_string_unescaped(self) -> str:
+        """Converts the JSON data to HL7 message format without escaping special characters."""
         ...
 
 __all__ = ["Hl7Json", "JsonHl7"]

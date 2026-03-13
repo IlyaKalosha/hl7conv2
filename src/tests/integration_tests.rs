@@ -208,7 +208,7 @@ fn test_json_to_hl7_roundtrip_complex() {
         segments.iter().map(|seg| seg.to_json()).collect();
 
     let json_hl7 = JsonHl7::new(json_result);
-    let converted_hl7 = json_hl7._convert_json_to_hl7();
+    let converted_hl7 = json_hl7._convert_json_to_hl7(true);
 
     let converted_lines: Vec<&str> = converted_hl7.lines().collect();
     let roundtrip_segments: Vec<Hl7Segment> = converted_lines
@@ -265,7 +265,7 @@ fn test_json_to_hl7_roundtrip_edge_cases() {
         segments.iter().map(|seg| seg.to_json()).collect();
 
     let json_hl7 = JsonHl7::new(json_result);
-    let converted_hl7 = json_hl7._convert_json_to_hl7();
+    let converted_hl7 = json_hl7._convert_json_to_hl7(true);
 
     let converted_lines: Vec<&str> = converted_hl7.lines().collect();
     let roundtrip_segments: Vec<Hl7Segment> = converted_lines
@@ -322,7 +322,7 @@ fn test_json_to_hl7_from_existing_example() {
         segments.iter().map(|seg| seg.to_json()).collect();
 
     let json_hl7 = JsonHl7::new(json_result);
-    let converted_hl7 = json_hl7._convert_json_to_hl7();
+    let converted_hl7 = json_hl7._convert_json_to_hl7(true);
 
     let converted_lines: Vec<&str> = converted_hl7.lines().collect();
     let roundtrip_segments: Vec<Hl7Segment> = converted_lines

@@ -298,7 +298,8 @@ print(f"Match: {original_hl7 == converted_hl7}")
 
 #### Properties
 - `json_data` - Original JSON data
-- `hl7_string` - Converted HL7 message string
+- `hl7_string` - Converted HL7 message string (with escaping)
+- `hl7_string_unescaped` - Converted HL7 message string without escaping
 
 ## Development
 

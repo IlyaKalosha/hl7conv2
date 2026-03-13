@@ -1,11 +1,11 @@
 [build-system]
-requires = ["maturin>=1.9.4,<2.0"]
+requires = ["maturin>=1.9.4"]
 build-backend = "maturin"
 
 [project]
 name = "hl7conv2"
 requires-python = ">=3.8"
-version = "0.2.1"
+version = "0.2.2"
 authors = [
     {name = "Ilya Kalosha", email = "kalosha.ilya@yandex.com"}
 ]
@@ -25,6 +25,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
