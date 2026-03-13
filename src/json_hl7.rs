@@ -41,14 +41,19 @@ impl JsonHl7 {
 
     #[getter]
     fn hl7_string(&self) -> PyResult<String> {
-        Ok(self._convert_json_to_hl7())
+        Ok(self._convert_json_to_hl7(true))
     }
 
-    pub fn _convert_json_to_hl7(&self) -> String {
+    #[getter]
+    fn hl7_string_unescaped(&self) -> PyResult<String> {
+        Ok(self._convert_json_to_hl7(false))
+    }
+
+    pub fn _convert_json_to_hl7(&self, escape: bool) -> String {
         let mut hl7_segments = Vec::new();
 
         for segment_json in &self.json_data {
-            let segment_string = self._convert_segment_json_to_hl7(segment_json);
+            let segment_string = self._convert_segment_json_to_hl7(segment_json, escape);
             hl7_segments.push(segment_string);
         }
 
@@ -57,7 +62,11 @@ impl JsonHl7 {
 }
 
 impl JsonHl7 {
-    pub fn _convert_segment_json_to_hl7(&self, segment_json: &BTreeMap<String, String>) -> String {
+    pub fn _convert_segment_json_to_hl7(
+        &self,
+        segment_json: &BTreeMap<String, String>,
+        escape: bool,
+    ) -> String {
         let mut fields = Vec::new();
 
         if let Some(segment_name) = segment_json.get("segment_name") {
@@ -67,19 +76,27 @@ impl JsonHl7 {
         let mut field_map: BTreeMap<usize, BTreeMap<usize, BTreeMap<usize, String>>> =
             BTreeMap::new();
 
+        let process_value = |value: &str| -> String {
+            if escape {
+                self.escape_handler.escape(value)
+            } else {
+                value.to_string()
+            }
+        };
+
         for (key, value) in segment_json {
             if key == "segment_name" {
                 continue;
             }
 
             if let Ok(field_index) = key.parse::<usize>() {
-                let escaped_value = self.escape_handler.escape(value);
+                let processed_value = process_value(value);
                 field_map
                     .entry(field_index)
                     .or_default()
                     .entry(0)
                     .or_default()
-                    .insert(0, escaped_value);
+                    .insert(0, processed_value);
             } else if key.contains('[') && key.contains(']') {
                 if let Some(bracket_start) = key.find('[') {
                     if let Some(bracket_end) = key.find(']') {
@@ -92,22 +109,22 @@ impl JsonHl7 {
                         {
                             if let Some(component_str) = component_part.strip_prefix('.') {
                                 if let Ok(component_index) = component_str.parse::<usize>() {
-                                    let escaped_value = self.escape_handler.escape(value);
+                                    let processed_value = process_value(value);
                                     field_map
                                         .entry(field_index)
                                         .or_default()
                                         .entry(rep_index)
                                         .or_default()
-                                        .insert(component_index, escaped_value);
+                                        .insert(component_index, processed_value);
                                 }
                             } else {
-                                let escaped_value = self.escape_handler.escape(value);
+                                let processed_value = process_value(value);
                                 field_map
                                     .entry(field_index)
                                     .or_default()
                                     .entry(rep_index)
                                     .or_default()
-                                    .insert(0, escaped_value);
+                                    .insert(0, processed_value);
                             }
                         }
                     }
@@ -118,13 +135,13 @@ impl JsonHl7 {
                     if let (Ok(parent_index), Ok(component_index)) =
                         (parts[0].parse::<usize>(), parts[1].parse::<usize>())
                     {
-                        let escaped_value = self.escape_handler.escape(value);
+                        let processed_value = process_value(value);
                         field_map
                             .entry(parent_index)
                             .or_default()
                             .entry(0)
                             .or_default()
-                            .insert(component_index, escaped_value);
+                            .insert(component_index, processed_value);
                     }
                 }
             }

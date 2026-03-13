@@ -14,7 +14,7 @@ fn test_json_to_hl7_with_repetitions() {
     segment_json.insert("5".to_string(), "Result".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "OBX|1|TX|HbA1c~CBC~Glucose||Result");
 }
@@ -33,7 +33,7 @@ fn test_json_to_hl7_with_repetitions_and_components() {
     segment_json.insert("5".to_string(), "Result".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "OBX|1|TX|HbA1c^Test1~CBC^Test2||Result");
 }
@@ -54,7 +54,7 @@ fn test_json_to_hl7_roundtrip() {
     segment_json.insert("5".to_string(), "Result".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let converted_hl7 = json_hl7._convert_json_to_hl7();
+    let converted_hl7 = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(converted_hl7, original_hl7);
 }
@@ -72,7 +72,7 @@ fn test_json_to_hl7_mixed_repetitions_and_regular_fields() {
     segment_json.insert("5".to_string(), "Result".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(
         hl7_string,
@@ -89,7 +89,7 @@ fn test_json_to_hl7_escaping_component_separator() {
     segment_json.insert("5.2".to_string(), "JOHN".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "PID|1||||DOE\\S\\JOHN^JOHN");
 }
@@ -102,7 +102,7 @@ fn test_json_to_hl7_escaping_field_separator() {
     segment_json.insert("5.1".to_string(), "DOE|JOHN".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "PID|1||||DOE\\F\\JOHN");
 }
@@ -115,7 +115,7 @@ fn test_json_to_hl7_escaping_repetition_separator() {
     segment_json.insert("5.1".to_string(), "DOE~JOHN".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "PID|1||||DOE\\R\\JOHN");
 }
@@ -128,7 +128,7 @@ fn test_json_to_hl7_escaping_escape_character() {
     segment_json.insert("5.1".to_string(), "DOE\\JOHN".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "PID|1||||DOE\\\\JOHN");
 }
@@ -141,7 +141,7 @@ fn test_json_to_hl7_escaping_subcomponent_separator() {
     segment_json.insert("5.1".to_string(), "DOE&JOHN".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "PID|1||||DOE\\T\\JOHN");
 }
@@ -157,7 +157,7 @@ fn test_json_to_hl7_escaping_multiple_special_chars() {
     );
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(
         hl7_string,
@@ -174,7 +174,7 @@ fn test_json_to_hl7_escaping_with_repetitions() {
     segment_json.insert("3[1]".to_string(), "ID2^TYPE2".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "PID|1||ID1\\S\\TYPE1~ID2\\S\\TYPE2");
 }
@@ -189,7 +189,7 @@ fn test_json_to_hl7_escaping_with_components() {
     segment_json.insert("5.3".to_string(), "A".to_string());
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "PID|1||||DOE^JOHN\\S\\MIDDLE^A");
 }
@@ -206,7 +206,23 @@ fn test_json_to_hl7_escaping_newlines_and_spaces() {
     );
 
     let json_hl7 = JsonHl7::new(vec![segment_json]);
-    let hl7_string = json_hl7._convert_json_to_hl7();
+    let hl7_string = json_hl7._convert_json_to_hl7(true);
 
     assert_eq!(hl7_string, "NTE|1|L|Line1\\X0A\\Line2\\X0D\\Line3\\X0D\\\\X0A\\\\X20\\\\X20\\Spaces\\X20\\\\X20\\\\X09\\Tab");
+}
+
+#[test]
+fn test_json_to_hl7_unescaped() {
+    let mut segment_json = BTreeMap::new();
+    segment_json.insert("segment_name".to_string(), "PID".to_string());
+    segment_json.insert("1".to_string(), "1".to_string());
+    segment_json.insert("5.1".to_string(), "DOE^JOHN".to_string());
+    segment_json.insert("5.2".to_string(), "JOHN".to_string());
+
+    let json_hl7 = JsonHl7::new(vec![segment_json]);
+    let hl7_escaped = json_hl7._convert_json_to_hl7(true);
+    let hl7_unescaped = json_hl7._convert_json_to_hl7(false);
+
+    assert_eq!(hl7_escaped, "PID|1||||DOE\\S\\JOHN^JOHN");
+    assert_eq!(hl7_unescaped, "PID|1||||DOE^JOHN^JOHN");
 }
