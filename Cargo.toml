@@ -1,6 +1,6 @@
 [package]
 name = "hl7conv2"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 authors = ["Ilya Kalosha <kalosha.ilya@yandex.com>"]
 description = "A high-performance HL7 to JSON converter written in Rust with Python bindings"
