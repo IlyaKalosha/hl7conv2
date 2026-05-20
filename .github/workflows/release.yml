@@ -16,13 +16,13 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-14, macos-15]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
 
@@ -30,7 +30,7 @@ jobs:
       run: python -m pip install --upgrade pip cibuildwheel
 
     - name: Preinstall maturin for non-isolated build
-      run: python -m pip install maturin
+      run: python -m pip install "maturin>=1.13"
 
     - name: Set up QEMU (for cross-arch Linux builds)
       if: startsWith(matrix.os, 'ubuntu')
@@ -40,18 +40,27 @@ jobs:
 
     - name: Build wheels
       env:
-        CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*
-        CIBW_SKIP: pp* *-musllinux*
+        CIBW_BUILD: >-
+          cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*
+          pp38-* pp39-* pp310-* pp311-* pp312-* pp313-* pp314-*
+        CIBW_ENABLE: cpython-freethreading
         CIBW_TEST_COMMAND: python -c "import hl7conv2; from hl7conv2 import Hl7Json, JsonHl7"
-        CIBW_ARCHS_LINUX: x86_64 aarch64
+        CIBW_ARCHS_LINUX: auto
         CIBW_ARCHS_MACOS: auto
+        CIBW_ARCHS_WINDOWS: auto
         CIBW_BUILD_FRONTEND: pip
         CIBW_BUILD_FRONTEND_ARGS: --no-build-isolation
         CIBW_BEFORE_BUILD_LINUX: >-
           python -m pip install -U maturin[patchelf]
           && curl https://sh.rustup.rs -sSf | sh -s -- -y
           && . "$HOME/.cargo/env"
-          && rustup target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu
+          && rustup target add
+          x86_64-unknown-linux-gnu i686-unknown-linux-gnu aarch64-unknown-linux-gnu
+          armv7-unknown-linux-gnueabihf powerpc64le-unknown-linux-gnu
+          s390x-unknown-linux-gnu riscv64gc-unknown-linux-gnu
+          x86_64-unknown-linux-musl i686-unknown-linux-musl aarch64-unknown-linux-musl
+          armv7-unknown-linux-musleabihf powerpc64le-unknown-linux-musl
+          s390x-unknown-linux-musl
         CIBW_ENVIRONMENT_LINUX: PATH="$HOME/.cargo/bin:$PATH"
         CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=10.12
         CIBW_MACOSX_DEPLOYMENT_TARGET: 10.12
@@ -69,10 +78,10 @@ jobs:
     name: Build sdist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
 
