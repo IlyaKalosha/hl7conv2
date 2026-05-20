@@ -1,11 +1,11 @@
 [build-system]
-requires = ["maturin>=1.9.4"]
+requires = ["maturin>=1.13"]
 build-backend = "maturin"
 
 [project]
 name = "hl7conv2"
 requires-python = ">=3.8"
-version = "0.2.3"
+version = "0.2.4"
 authors = [
     {name = "Ilya Kalosha", email = "kalosha.ilya@yandex.com"}
 ]
