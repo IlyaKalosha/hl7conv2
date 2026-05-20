@@ -40,10 +40,9 @@ jobs:
 
     - name: Build wheels
       env:
-        CIBW_BUILD: >-
-          cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*
-          pp38-* pp39-* pp310-* pp311-* pp312-* pp313-* pp314-*
-        CIBW_ENABLE: pypy pypy-eol cpython-freethreading
+        CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*
+        CIBW_SKIP: pp*
+        CIBW_ENABLE: cpython-freethreading
         CIBW_TEST_COMMAND: python -c "import hl7conv2; from hl7conv2 import Hl7Json, JsonHl7"
         CIBW_ARCHS_LINUX: auto
         CIBW_ARCHS_MACOS: auto
