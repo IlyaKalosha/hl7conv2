@@ -43,6 +43,10 @@ dependencies = []
 
 
 [tool.maturin]
-features = ["pyo3/extension-module"]
+features = ["pyo3/extension-module", "pyo3/generate-import-lib"]
 module-name = "hl7conv2.hl7conv2"
 python-source = "python"
+
+[[tool.cibuildwheel.overrides]]
+select = "*-win_arm64"
+environment = { PYO3_CROSS = "1" }
