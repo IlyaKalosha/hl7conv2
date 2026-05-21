@@ -41,7 +41,7 @@ jobs:
     - name: Build wheels
       env:
         CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*
-        CIBW_SKIP: pp*
+        CIBW_SKIP: pp* *-musllinux_s390x*
         CIBW_ENABLE: cpython-freethreading
         CIBW_TEST_COMMAND: python -c "import hl7conv2; from hl7conv2 import Hl7Json, JsonHl7"
         CIBW_ARCHS_LINUX: auto
@@ -49,17 +49,24 @@ jobs:
         CIBW_ARCHS_WINDOWS: auto
         CIBW_BUILD_FRONTEND: pip
         CIBW_BUILD_FRONTEND_ARGS: --no-build-isolation
-        CIBW_BEFORE_BUILD_LINUX: >-
+        CIBW_BEFORE_BUILD_LINUX: |
+          set -eux
           python -m pip install -U maturin[patchelf]
-          && curl https://sh.rustup.rs -sSf | sh -s -- -y
-          && . "$HOME/.cargo/env"
-          && rustup target add
-          x86_64-unknown-linux-gnu i686-unknown-linux-gnu aarch64-unknown-linux-gnu
-          armv7-unknown-linux-gnueabihf powerpc64le-unknown-linux-gnu
-          s390x-unknown-linux-gnu riscv64gc-unknown-linux-gnu
-          x86_64-unknown-linux-musl i686-unknown-linux-musl aarch64-unknown-linux-musl
-          armv7-unknown-linux-musleabihf powerpc64le-unknown-linux-musl
-          s390x-unknown-linux-musl
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
+          . "$HOME/.cargo/env"
+          rustup target add \
+            x86_64-unknown-linux-gnu \
+            i686-unknown-linux-gnu \
+            aarch64-unknown-linux-gnu \
+            armv7-unknown-linux-gnueabihf \
+            powerpc64le-unknown-linux-gnu \
+            s390x-unknown-linux-gnu \
+            riscv64gc-unknown-linux-gnu \
+            x86_64-unknown-linux-musl \
+            i686-unknown-linux-musl \
+            aarch64-unknown-linux-musl \
+            armv7-unknown-linux-musleabihf \
+            powerpc64le-unknown-linux-musl
         CIBW_ENVIRONMENT_LINUX: PATH="$HOME/.cargo/bin:$PATH"
         CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=10.12
         CIBW_MACOSX_DEPLOYMENT_TARGET: 10.12
