@@ -1,6 +1,6 @@
 [package]
 name = "hl7conv2"
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 authors = ["Ilya Kalosha <kalosha.ilya@yandex.com>"]
 description = "A high-performance HL7 to JSON converter written in Rust with Python bindings"
@@ -17,7 +17,7 @@ name = "hl7conv2"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-pyo3 = { version = "0.28" }
+pyo3 = { version = "0.29" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "2.0"
