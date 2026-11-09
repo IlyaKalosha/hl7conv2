@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Dict, Union, Optional
 
 class Hl7Json:
@@ -84,4 +85,12 @@ class JsonHl7:
         """Converts the JSON data to HL7 message format without escaping special characters."""
         ...
 
-__all__ = ["Hl7Json", "JsonHl7"]
+def parse_hl7_datetime(value: str) -> Optional[datetime]:
+    """Parses an HL7 date/time (``YYYYMMDDHHMM[SS[.S[S[S[S]]]]][+/-ZZZZ]``).
+
+    Returns a ``datetime`` (timezone-aware if the value has a UTC offset),
+    or ``None`` for a null date (year ``0000``). Raises ``ValueError`` on invalid input.
+    """
+    ...
+
+__all__ = ["Hl7Json", "JsonHl7", "parse_hl7_datetime"]

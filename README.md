@@ -251,6 +251,26 @@ The library provides detailed error messages for various scenarios:
 - **Field Errors**: Field-specific problems with segment and field information
 - **Component Errors**: Component-specific issues with detailed location
 
+## Date/Time Parsing
+
+`parse_hl7_datetime` converts an HL7 date/time value in the format
+`YYYYMMDDHHMM[SS[.S[S[S[S]]]]][+/-ZZZZ]` into a Python `datetime`:
+
+- `YYYY` is required; month, day, hour and minute are required unless the year is `0000`
+- seconds and up to four fractional-second digits are optional
+- the UTC offset is optional; when present the result is timezone-aware
+- a year of `0000` denotes a null date and returns `None`
+- invalid values raise `ValueError`
+
+```python
+from hl7conv2 import parse_hl7_datetime
+
+parse_hl7_datetime("202401311530")             # datetime(2024, 1, 31, 15, 30)
+parse_hl7_datetime("20240131153045.25")        # datetime(2024, 1, 31, 15, 30, 45, 250000)
+parse_hl7_datetime("20240131153045-0500")      # datetime(..., tzinfo=timezone(timedelta(hours=-5)))
+parse_hl7_datetime("0000")                     # None
+```
+
 ## Bidirectional Conversion Example
 
 ```python
@@ -300,6 +320,9 @@ print(f"Match: {original_hl7 == converted_hl7}")
 - `json_data` - Original JSON data
 - `hl7_string` - Converted HL7 message string (with escaping)
 - `hl7_string_unescaped` - Converted HL7 message string without escaping
+
+### Functions
+- `parse_hl7_datetime(value)` - Parse an HL7 date/time string into a `datetime` (or `None` for year `0000`)
 
 ## Development
 
