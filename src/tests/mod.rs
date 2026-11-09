@@ -21,3 +21,6 @@ mod errors_tests;
 
 #[cfg(test)]
 mod pyo3_api_tests;
+
+#[cfg(test)]
+mod datetime_tests;
