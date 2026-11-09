@@ -226,3 +226,25 @@ fn test_json_to_hl7_unescaped() {
     assert_eq!(hl7_escaped, "PID|1||||DOE\\S\\JOHN^JOHN");
     assert_eq!(hl7_unescaped, "PID|1||||DOE^JOHN^JOHN");
 }
+
+#[test]
+fn test_json_to_hl7_components_take_precedence_over_whole_field() {
+    let mut segment_json = BTreeMap::new();
+    segment_json.insert("segment_name".to_string(), "OBX".to_string());
+    segment_json.insert("1".to_string(), "1".to_string());
+    segment_json.insert("5".to_string(), "old^old".to_string());
+    segment_json.insert("5.1".to_string(), "new".to_string());
+    segment_json.insert("5.2".to_string(), "value".to_string());
+
+    let json_hl7 = JsonHl7::new(vec![segment_json]);
+    assert_eq!(json_hl7._convert_json_to_hl7(true), "OBX|1||||new^value");
+}
+
+#[test]
+fn test_hl7_json_round_trip_with_whole_field_keys() {
+    let hl7 = "OBX|1|TX|HbA1c^Test1~CBC~Glucose^X||test^test^test";
+    let json = crate::segments::Hl7Segment::from_string(hl7, None).to_json();
+
+    let json_hl7 = JsonHl7::new(vec![json]);
+    assert_eq!(json_hl7._convert_json_to_hl7(true), hl7);
+}

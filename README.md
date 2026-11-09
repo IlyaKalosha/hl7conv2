@@ -174,7 +174,10 @@ The JSON format uses the following structure:
 - **`segment_name`**: Contains the segment type (MSH, PID, EVN, etc.)
 - **Numeric keys**: Field positions (1, 2, 3, etc.)
 - **Dot notation**: Field components (3.1, 3.2, 3.3 for field 3 components)
+- **Whole field**: A field that has components or repetitions is also available as a whole under its plain key, exactly as it appears in the message (e.g. `"5": "test^test^test"` next to `"5.1"`, `"5.2"`, `"5.3"`). Each repetition with components is likewise available as `"3[0]"`, `"3[1]"`, ...
 - **Empty strings**: Represent empty fields
+
+When converting JSON back to HL7, component and repetition keys (`5.1`, `3[0].1`, ...) take precedence over the whole-field key; the whole-field key is used only when a field has no detailed keys.
 
 #### Example JSON Structure:
 ```json
@@ -184,6 +187,7 @@ The JSON format uses the following structure:
     "1": "^~\\&",
     "2": "ADT1",
     "3": "HOSPITAL",
+    "8": "ADT^A01^ADT_A01",
     "8.1": "ADT",
     "8.2": "A01",
     "8.3": "ADT_A01"
@@ -191,6 +195,7 @@ The JSON format uses the following structure:
   {
     "segment_name": "PID",
     "1": "1",
+    "3": "PATID1234^5^M11",
     "3.1": "PATID1234",
     "3.2": "5",
     "3.3": "M11"
