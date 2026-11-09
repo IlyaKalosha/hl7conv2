@@ -10,7 +10,10 @@ pub struct Hl7Segment {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Hl7Field {
+    /// Field value. Unescaped when an escape handler is used.
     pub value: String,
+    /// Field exactly as it appears in the message (separators and escape sequences kept).
+    pub raw: String,
     pub components: Option<Vec<String>>,
     pub repetitions: Option<Vec<Hl7Field>>,
 }
@@ -42,8 +45,10 @@ impl Hl7Segment {
 
         for (index, field) in &self.fields {
             if let Some(ref repetitions) = field.repetitions {
+                json.insert(index.to_string(), field.raw.clone());
                 for (rep_index, repetition) in repetitions.iter().enumerate() {
                     if let Some(ref components) = repetition.components {
+                        json.insert(format!("{}[{}]", index, rep_index), repetition.raw.clone());
                         for (comp_index, component) in components.iter().enumerate() {
                             let key = format!("{}[{}].{}", index, rep_index, comp_index + 1);
                             json.insert(key, component.clone());
@@ -54,6 +59,7 @@ impl Hl7Segment {
                     }
                 }
             } else if let Some(ref components) = field.components {
+                json.insert(index.to_string(), field.raw.clone());
                 for (comp_index, component) in components.iter().enumerate() {
                     let key = format!("{}.{}", index, comp_index + 1);
                     json.insert(key, component.clone());
@@ -99,6 +105,7 @@ impl Hl7Field {
                     };
                     Hl7Field {
                         value,
+                        raw: rep_str.to_string(),
                         components,
                         repetitions: None,
                     }
@@ -107,6 +114,7 @@ impl Hl7Field {
 
             Hl7Field {
                 value: field_str.to_string(),
+                raw: field_str.to_string(),
                 components: None,
                 repetitions: Some(repetitions),
             }
@@ -131,6 +139,7 @@ impl Hl7Field {
 
             Hl7Field {
                 value,
+                raw: field_str.to_string(),
                 components,
                 repetitions: None,
             }
