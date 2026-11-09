@@ -131,3 +131,37 @@ fn test_segment_to_json_with_repetitions_and_components() {
     assert_eq!(json.get("4"), Some(&"".to_string()));
     assert_eq!(json.get("5"), Some(&"Result".to_string()));
 }
+
+#[test]
+fn test_segment_to_json_includes_whole_composite_field() {
+    let segment = Hl7Segment::from_string("OBX|1|ST|CODE||test^test^test", None);
+    let json = segment.to_json();
+
+    assert_eq!(json.get("5"), Some(&"test^test^test".to_string()));
+    assert_eq!(json.get("5.1"), Some(&"test".to_string()));
+    assert_eq!(json.get("5.2"), Some(&"test".to_string()));
+    assert_eq!(json.get("5.3"), Some(&"test".to_string()));
+}
+
+#[test]
+fn test_segment_to_json_includes_whole_repeated_field() {
+    let segment = Hl7Segment::from_string("OBX|1|TX|HbA1c^Test1~CBC||Result", None);
+    let json = segment.to_json();
+
+    assert_eq!(json.get("3"), Some(&"HbA1c^Test1~CBC".to_string()));
+    assert_eq!(json.get("3[0]"), Some(&"HbA1c^Test1".to_string()));
+    assert_eq!(json.get("3[0].1"), Some(&"HbA1c".to_string()));
+    assert_eq!(json.get("3[0].2"), Some(&"Test1".to_string()));
+    assert_eq!(json.get("3[1]"), Some(&"CBC".to_string()));
+}
+
+#[test]
+fn test_whole_composite_field_keeps_escape_sequences() {
+    let handler = crate::escape::create_default_escape_handler();
+    let segment = Hl7Segment::from_string("OBX|1|ST|CODE||a\\T\\b^c", Some(&handler));
+    let json = segment.to_json();
+
+    assert_eq!(json.get("5"), Some(&"a\\T\\b^c".to_string()));
+    assert_eq!(json.get("5.1"), Some(&"a&b".to_string()));
+    assert_eq!(json.get("5.2"), Some(&"c".to_string()));
+}

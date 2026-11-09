@@ -12,6 +12,7 @@ fn segment_with_fields(name: &str, fields: BTreeMap<usize, Hl7Field>) -> Hl7Segm
 fn simple_field(value: &str) -> Hl7Field {
     Hl7Field {
         value: value.to_string(),
+        raw: value.to_string(),
         components: None,
         repetitions: None,
     }
@@ -226,6 +227,7 @@ fn validation_component_too_long() {
     let long_comp = "x".repeat(65537);
     let field_with_long_component = Hl7Field {
         value: "a^b".to_string(),
+        raw: "a^b".to_string(),
         components: Some(vec!["a".to_string(), long_comp]),
         repetitions: None,
     };

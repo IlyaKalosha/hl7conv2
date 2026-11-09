@@ -75,6 +75,9 @@ impl JsonHl7 {
 
         let mut field_map: BTreeMap<usize, BTreeMap<usize, BTreeMap<usize, String>>> =
             BTreeMap::new();
+        // Whole-field values ("5"). For composite fields the parser also emits
+        // detailed keys ("5.1", "5[0].1", ...); those take precedence when present.
+        let mut whole_fields: BTreeMap<usize, String> = BTreeMap::new();
 
         let process_value = |value: &str| -> String {
             if escape {
@@ -90,13 +93,7 @@ impl JsonHl7 {
             }
 
             if let Ok(field_index) = key.parse::<usize>() {
-                let processed_value = process_value(value);
-                field_map
-                    .entry(field_index)
-                    .or_default()
-                    .entry(0)
-                    .or_default()
-                    .insert(0, processed_value);
+                whole_fields.insert(field_index, process_value(value));
             } else if key.contains('[') && key.contains(']') {
                 if let Some(bracket_start) = key.find('[') {
                     if let Some(bracket_end) = key.find(']') {
@@ -145,6 +142,12 @@ impl JsonHl7 {
                     }
                 }
             }
+        }
+
+        for (field_index, value) in whole_fields {
+            field_map
+                .entry(field_index)
+                .or_insert_with(|| BTreeMap::from([(0, BTreeMap::from([(0, value)]))]));
         }
 
         let max_index = field_map.keys().max().copied().unwrap_or(0);
